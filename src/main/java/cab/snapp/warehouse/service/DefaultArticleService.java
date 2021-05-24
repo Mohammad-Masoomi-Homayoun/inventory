@@ -32,6 +32,14 @@ public class DefaultArticleService implements ArticleService {
   private ArticleRepository articleRepository;
 
   @Override
+  public List<ArticleTo> createAll(@Valid List<ArticleTo> articleToList) throws ValidationException {
+
+    List<Article> articleList = articleMapper.mapToDomainList(articleToList);
+
+    return articleMapper.mapToDtoList(articleRepository.saveAll(articleList));
+  }
+
+  @Override
   public ArticleTo create(@Valid ArticleTo articleTo) throws ValidationException {
 
     if (articleTo == null) {
@@ -75,7 +83,8 @@ public class DefaultArticleService implements ArticleService {
   @Override
   public List<ArticleTo> importArticles(MultipartFile inventory) {
 
-    return articleParser(inventory);
+    List<ArticleTo> articleList = articleParser(inventory);
+    return createAll(articleList);
   }
 
   private List<ArticleTo> articleParser(MultipartFile file) {
