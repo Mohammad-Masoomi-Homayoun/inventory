@@ -32,7 +32,8 @@ public class DefaultArticleService implements ArticleService {
   private ArticleRepository articleRepository;
 
   @Override
-  public List<ArticleTo> createAll(@Valid List<ArticleTo> articleToList) throws ValidationException {
+  public List<ArticleTo> createAll(@Valid List<ArticleTo> articleToList)
+      throws ValidationException {
 
     List<Article> articleList = articleMapper.mapToDomainList(articleToList);
 
@@ -46,7 +47,7 @@ public class DefaultArticleService implements ArticleService {
       throw new IllegalArgumentException("Article could not be null");
     }
 
-    Article article = new Article(articleTo.getArticleId(), articleTo.getName(),
+    Article article = new Article(null, articleTo.getArticleId(), articleTo.getName(),
         articleTo.getAmount(), articleTo.getStock());
 
     return articleMapper.mapToDto(articleRepository.save(article));
@@ -83,31 +84,41 @@ public class DefaultArticleService implements ArticleService {
   @Override
   public List<ArticleTo> importArticles(MultipartFile inventory) {
 
-    List<ArticleTo> articleList = articleParser(inventory);
+    List<ArticleTo> articleList = inventoryParser(inventory);
     return createAll(articleList);
   }
 
-  private List<ArticleTo> articleParser(MultipartFile file) {
+  private List<ArticleTo> inventoryParser(MultipartFile file) {
 
     if (file == null) {
       return null;
     }
 
-    List<ArticleTo> articleList = new ArrayList<>();
+    List<ArticleTo> articleList;
     JSONParser jsonParser = new JSONParser();
     try (InputStreamReader reader = new InputStreamReader(file.getInputStream())) {
       JSONObject obj = (JSONObject) jsonParser.parse(reader);
-      for (Object article : (JSONArray) obj.get("inventory")) {
-        articleList.add(articleMaker((JSONObject) article));
-      }
+      articleList = articleParser((JSONArray) obj.get("inventory"));
     } catch (IOException | ParseException e) {
-      throw new ValidationException("File is not in expected format", HttpStatus.BAD_REQUEST, 40002);
+      throw new ValidationException("File is not in expected format", HttpStatus.BAD_REQUEST,
+          40002);
     }
 
     return articleList;
   }
 
-  private ArticleTo articleMaker(JSONObject article) {
+  @Override
+  public List<ArticleTo> articleParser(JSONArray articlesJsonArray) throws ValidationException{
+
+    List<ArticleTo> articleToList = new ArrayList<>();
+    for (Object article : articlesJsonArray) {
+      articleToList.add(articleMaker((JSONObject) article));
+    }
+
+    return articleToList;
+  }
+
+  private ArticleTo articleMaker(JSONObject article) throws ValidationException{
 
     if (article == null) {
       return null;
@@ -115,9 +126,10 @@ public class DefaultArticleService implements ArticleService {
 
     ArticleTo articleTo = new ArticleTo();
 
-    if (article.get("articleId") != null) {
-      articleTo.setArticleId(Long.parseLong(article.get("articleId").toString()));
+    if (article.get("articleId") == null) {
+      throw new ValidationException("Article should has id", HttpStatus.BAD_REQUEST, 40005);
     }
+    articleTo.setArticleId(Long.parseLong(article.get("articleId").toString()));
 
     if (article.get("name") != null) {
       articleTo.setName(article.get("name").toString());

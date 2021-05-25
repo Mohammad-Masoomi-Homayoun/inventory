@@ -7,7 +7,7 @@ import javax.validation.Valid;
 
 public interface CrudService<TO, ID> {
 
-  List<TO> createAll(@Valid List<TO> to) throws  ValidationException;
+  List<TO> createAll(@Valid List<TO> to) throws ValidationException;
 
   TO create(@Valid TO to) throws ValidationException;
 

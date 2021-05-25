@@ -19,7 +19,8 @@ public class ArticleController extends BaseController<ArticleTo, Long, ArticleSe
   public ResultTo importArticles(@RequestParam("inventory") MultipartFile inventory) {
 
     if (inventory == null) {
-      throw new ValidationException("Request should include inventory file", HttpStatus.BAD_REQUEST, 40001);
+      throw new ValidationException("Request should include inventory file", HttpStatus.BAD_REQUEST,
+          40001);
     }
 
     return createResultTo(service.importArticles(inventory));

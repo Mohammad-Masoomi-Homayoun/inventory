@@ -23,7 +23,7 @@ public class ArticleMapper implements BaseDtoDomainMapper<ArticleTo, Article> {
       return null;
     }
 
-    return new Article(articleTo.getArticleId(), articleTo.getName(), articleTo.getStock(),
+    return new Article(null, articleTo.getArticleId(), articleTo.getName(), articleTo.getStock(),
         articleTo.getAmount());
   }
 }
