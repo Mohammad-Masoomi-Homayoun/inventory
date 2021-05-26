@@ -1,16 +1,19 @@
 package cab.snapp.warehouse.matcher;
 
+import cab.snapp.warehouse.service.model.ValidationException;
 import cab.snapp.warehouse.to.ArticleTo;
 import cab.snapp.warehouse.to.MatchedProductTo;
 import cab.snapp.warehouse.to.ProductTo;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 @Component
+@Log4j2
 public class DefaultProductMatcher implements ProductMatcher {
 
   @Override
@@ -20,42 +23,51 @@ public class DefaultProductMatcher implements ProductMatcher {
       return null;
     }
 
-    Map<String, Integer> matchedProducts = new HashMap<>();
-
     Map<Long, Integer> articlesAsset = new HashMap<>();
     for (ArticleTo article : articles) {
       articlesAsset.put(article.getArticleId(), article.getStock());
     }
 
-    // Round Robin match products
-    int counter = 0;
-    while (products.size() > 0) {
-      ProductTo product = products.get(counter);
-      if (canMakeProductThenMake(product.getArticleToList(), articlesAsset)) {
-        matchedProducts.put(product.getName(), matchedProducts.getOrDefault(product.getName(), 0) + 1);
-      } else {
-        products.remove(counter);
-      }
-      counter++;
-      if (counter == products.size()) {
-        counter = 0;
-      }
-    }
-
-    return resultConvertor(matchedProducts);
+    return roundRobinMatch(products, articlesAsset);
   }
 
-  private List<MatchedProductTo> resultConvertor(Map matchedProducts) {
+  public List<MatchedProductTo> roundRobinMatch(List<ProductTo> products, Map articlesAsset) {
 
-    List<MatchedProductTo> matchedProductToList = new ArrayList<>();
-    Iterator matchIterator = matchedProducts.entrySet().iterator();
-    while (matchIterator.hasNext()) {
-      Map.Entry pair = (Map.Entry) matchIterator.next();
-      matchedProductToList
-          .add(new MatchedProductTo(pair.getKey().toString(), (Integer) pair.getValue()));
-      matchIterator.remove();
+    Map<Long, MatchedProductTo> matchedProducts = new HashMap<>();
+    int counter = 0;
+
+    try {
+      while (products.size() > 0) {
+        ProductTo product = products.get(counter);
+        if (canMakeProductThenMake(product.getArticleToList(), articlesAsset)) {
+          updateMatchedProducts(matchedProducts, product);
+        } else {
+          products.remove(counter);
+        }
+        counter++;
+        if (counter >= products.size()) {
+          counter = 0;
+        }
+      }
+    } catch (Exception e) {
+      log.debug(e.getMessage());
+      throw new ValidationException("Problem in RoundRobin matching products",
+          HttpStatus.INTERNAL_SERVER_ERROR, 50004);
     }
-    return matchedProductToList;
+
+    return matchedProducts.values().stream().collect(Collectors.toList());
+  }
+
+  private void updateMatchedProducts(Map<Long, MatchedProductTo> matchedProducts,
+      ProductTo product) {
+    MatchedProductTo matchedProductTo = matchedProducts.get(product.getId());
+    if (matchedProductTo == null) {
+      matchedProducts
+          .put(product.getId(), new MatchedProductTo(product.getId(), product.getName(), 1));
+    } else {
+      matchedProductTo.increase();
+      matchedProducts.put(product.getId(), matchedProductTo);
+    }
   }
 
   public Boolean canMakeProductThenMake(List<ArticleTo> requiredArticles, Map source) {

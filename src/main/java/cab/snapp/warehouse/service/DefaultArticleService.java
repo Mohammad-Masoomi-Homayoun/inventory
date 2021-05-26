@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Resource;
+import javax.transaction.Transactional;
 import javax.validation.Valid;
 import lombok.extern.log4j.Log4j2;
 import org.json.simple.JSONArray;
@@ -35,9 +36,33 @@ public class DefaultArticleService implements ArticleService {
   public List<ArticleTo> createAll(@Valid List<ArticleTo> articleToList)
       throws ValidationException {
 
-    List<Article> articleList = articleMapper.mapToDomainList(articleToList);
+    List<ArticleTo> result = new ArrayList<>();
+    for (ArticleTo articleTo : articleToList) {
+      if (isProductArticle(articleTo)) {
+        result.add(create(articleTo));
+      } else {
+        Article oldArticle = articleRepository.findByArticleId(articleTo.getArticleId());
+        if (oldArticle == null) {
+          result.add(create(articleTo));
+        } else {
+          oldArticle.setName(articleTo.getName());
+          oldArticle.setStock(articleTo.getStock());
+          result.add(articleMapper.mapToDto(articleRepository.save(oldArticle)));
+        }
+      }
+    }
 
-    return articleMapper.mapToDtoList(articleRepository.saveAll(articleList));
+    return result;
+  }
+
+  private Boolean isProductArticle(ArticleTo articleTo) {
+
+    if (articleTo.getName() == null && articleTo.getStock() == null
+        && articleTo.getAmount() != null) {
+      return true;
+    }
+
+    return false;
   }
 
   @Override
@@ -123,6 +148,28 @@ public class DefaultArticleService implements ArticleService {
 
     return articleMapper
         .mapToDtoList(articleRepository.findAllByArticleIdNotNullAndNameNotNullAndStockNotNull());
+  }
+
+  @Override
+  @Transactional
+  public void sell(List<ArticleTo> articleToList) {
+
+    for (ArticleTo article : articleToList) {
+      Article persistArticle;
+      try {
+        persistArticle = articleRepository.findByArticleId(article.getArticleId());
+      } catch (Exception e) {
+        log.debug(e.getMessage());
+        throw new ValidationException("Beacuse of Database errors can't complete this transaction!",
+            HttpStatus.INTERNAL_SERVER_ERROR, 50003);
+      }
+      if (persistArticle == null || persistArticle.getStock() < article.getAmount()) {
+        throw new ValidationException("There is not enough stock in db!",
+            HttpStatus.NOT_FOUND, 50004);
+      }
+      persistArticle.setStock(persistArticle.getStock() - article.getAmount());
+      articleRepository.save(persistArticle);
+    }
   }
 
   private ArticleTo articleMaker(JSONObject article) throws ValidationException {

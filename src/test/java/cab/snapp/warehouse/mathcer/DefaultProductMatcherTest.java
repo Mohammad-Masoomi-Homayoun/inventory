@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertEquals;
+
 import cab.snapp.warehouse.matcher.DefaultProductMatcher;
 import cab.snapp.warehouse.to.ArticleTo;
 import cab.snapp.warehouse.to.ProductTo;

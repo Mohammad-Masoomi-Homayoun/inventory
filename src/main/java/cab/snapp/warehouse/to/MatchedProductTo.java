@@ -12,6 +12,11 @@ import lombok.Setter;
 @Setter
 public class MatchedProductTo {
 
+  private Long id;
   private String product;
   private Integer available;
+
+  public void increase() {
+    this.available++;
+  }
 }

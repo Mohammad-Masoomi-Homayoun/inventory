@@ -110,9 +110,9 @@ public class DefaultProductService implements ProductService {
   @Override
   public ProductTo sellProduct(Long id) {
 
-//    ProductTo productTo = findById(id);
-
-    return null;
+    ProductTo productTo = productMapper.mapToDto(findById(id));
+    articleService.sell(productTo.getArticleToList());
+    return productTo;
   }
 
   private List<ProductTo> productParser(MultipartFile file) throws ValidationException {
