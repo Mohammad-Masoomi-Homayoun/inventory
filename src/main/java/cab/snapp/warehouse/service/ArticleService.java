@@ -13,4 +13,6 @@ public interface ArticleService extends CrudService<ArticleTo, Long> {
 
   List<ArticleTo> articleParser(JSONArray articleJsonArray) throws ValidationException;
 
+  List<ArticleTo> getAllArticles();
+
 }

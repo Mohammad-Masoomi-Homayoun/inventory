@@ -15,7 +15,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.engine.internal.Cascade;
 
 @Entity
 @NoArgsConstructor
@@ -31,7 +30,7 @@ public class Product {
   private Long id;
   private String name;
   @Column(name = "article_id")
-  @OneToMany(cascade = {CascadeType.ALL},fetch= FetchType.EAGER)
+  @OneToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
   private List<Article> articleList = new ArrayList<>();
 
   public Product(String name, List<Article> articleList) {

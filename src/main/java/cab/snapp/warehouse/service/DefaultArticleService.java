@@ -108,7 +108,7 @@ public class DefaultArticleService implements ArticleService {
   }
 
   @Override
-  public List<ArticleTo> articleParser(JSONArray articlesJsonArray) throws ValidationException{
+  public List<ArticleTo> articleParser(JSONArray articlesJsonArray) throws ValidationException {
 
     List<ArticleTo> articleToList = new ArrayList<>();
     for (Object article : articlesJsonArray) {
@@ -118,7 +118,14 @@ public class DefaultArticleService implements ArticleService {
     return articleToList;
   }
 
-  private ArticleTo articleMaker(JSONObject article) throws ValidationException{
+  @Override
+  public List<ArticleTo> getAllArticles() {
+
+    return articleMapper
+        .mapToDtoList(articleRepository.findAllByArticleIdNotNullAndNameNotNullAndStockNotNull());
+  }
+
+  private ArticleTo articleMaker(JSONObject article) throws ValidationException {
 
     if (article == null) {
       return null;

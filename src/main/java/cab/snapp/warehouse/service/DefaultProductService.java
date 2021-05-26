@@ -1,10 +1,13 @@
 package cab.snapp.warehouse.service;
 
+import cab.snapp.warehouse.matcher.ProductMatcher;
 import cab.snapp.warehouse.service.mapper.ArticleMapper;
 import cab.snapp.warehouse.service.mapper.ProductMapper;
 import cab.snapp.warehouse.service.model.NotFoundException;
 import cab.snapp.warehouse.service.model.Product;
 import cab.snapp.warehouse.service.model.ValidationException;
+import cab.snapp.warehouse.to.ArticleTo;
+import cab.snapp.warehouse.to.MatchedProductTo;
 import cab.snapp.warehouse.to.ProductTo;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -35,6 +38,8 @@ public class DefaultProductService implements ProductService {
   private ProductRepository productRepository;
   @Resource
   private ArticleService articleService;
+  @Resource
+  private ProductMatcher productMatcher;
 
   @Override
   public List<ProductTo> createAll(@Valid List<ProductTo> productToList)
@@ -94,9 +99,20 @@ public class DefaultProductService implements ProductService {
   }
 
   @Override
-  public List<ProductTo> getAllProducts() {
+  public List<MatchedProductTo> getAllProducts() {
 
-    return productMapper.mapToDtoList(productRepository.findAll());
+    List<ProductTo> products = productMapper.mapToDtoList(productRepository.findAll());
+    List<ArticleTo> articles = articleService.getAllArticles();
+
+    return productMatcher.match(products, articles);
+  }
+
+  @Override
+  public ProductTo sellProduct(Long id) {
+
+//    ProductTo productTo = findById(id);
+
+    return null;
   }
 
   private List<ProductTo> productParser(MultipartFile file) throws ValidationException {

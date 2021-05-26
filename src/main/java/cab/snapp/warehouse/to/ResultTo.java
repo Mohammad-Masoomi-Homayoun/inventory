@@ -12,6 +12,7 @@ import lombok.Setter;
 @NoArgsConstructor
 public class ResultTo {
 
+  private Long id;
   @JsonProperty("total_count")
   private Integer totalCount = 0;
   private Integer count = 0;

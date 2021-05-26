@@ -5,13 +5,13 @@ import cab.snapp.warehouse.service.model.Product;
 import cab.snapp.warehouse.to.ArticleTo;
 import cab.snapp.warehouse.to.ProductTo;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import javax.annotation.Resource;
 import org.springframework.stereotype.Component;
 
 @Component
 public class ProductMapper implements BaseDtoDomainMapper<ProductTo, Product> {
 
-  @Autowired
+  @Resource
   private ArticleMapper articleMapper;
 
   @Override
