@@ -89,7 +89,18 @@ Article service provides create, creatAll, update, get, sell, articleParser and 
 ## HowToUse
 
 To use this application make sure docker-compose is up see [here](#docker). Then run project and import inventory and products file. So you can try to sell product ;).
-        
+
+###### 1. import inventory by this curl
+    curl --location --request POST 'localhost:8080/api/v1/articles/import' \
+    --form 'inventory=@"/Users/mohammadmasoomi/Downloads/back-end-software-engineer-candidate-assignment/inventory.json"'
+###### 2. import products by this curl
+    curl --location --request POST 'localhost:8080/api/v1/products/import' \
+    --form 'products=@"/Users/mohammadmasoomi/Downloads/back-end-software-engineer-candidate-assignment/products.json"'
+###### 3. get the list of products by this curl
+    curl --location --request GET 'localhost:8080/api/v1/products'
+###### 4. sell each product you want by this curl
+    curl --location --request DELETE 'localhost:8080/api/v1/products/1/sell'
+
 ## Docker 
 
 To start MySql cd to docker folder and then run this command: 
