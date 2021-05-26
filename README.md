@@ -55,7 +55,7 @@ Product service provides create, creatAll, update, get, sellProduct, productPars
     
    Is repository of product object. Does the main CRUD operations on the persistence layer.
 
-##ArticleController
+## ArticleController
 
  ArticleController provides REST import API for the article-service.
  
