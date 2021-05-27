@@ -113,7 +113,7 @@ public class DefaultArticleService implements ArticleService {
     return createAll(articleList);
   }
 
-  private List<ArticleTo> inventoryParser(MultipartFile file) {
+  public List<ArticleTo> inventoryParser(MultipartFile file) {
 
     if (file == null) {
       return null;

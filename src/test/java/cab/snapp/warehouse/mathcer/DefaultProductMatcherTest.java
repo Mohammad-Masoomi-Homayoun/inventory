@@ -25,7 +25,7 @@ public class DefaultProductMatcherTest {
   private List<ArticleTo> articles = new ArrayList<>();
 
   @Before
-  public void init() {
+  public void setUp() {
     defaultProductMatcher = new DefaultProductMatcher();
   }
 
