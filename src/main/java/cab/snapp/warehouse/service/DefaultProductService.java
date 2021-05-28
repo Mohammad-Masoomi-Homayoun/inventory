@@ -115,7 +115,7 @@ public class DefaultProductService implements ProductService {
     return productTo;
   }
 
-  private List<ProductTo> productParser(MultipartFile file) throws ValidationException {
+  public List<ProductTo> productParser(MultipartFile file) throws ValidationException {
 
     if (file == null) {
       return null;

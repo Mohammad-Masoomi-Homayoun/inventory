@@ -1,0 +1,40 @@
+{
+  "products": [
+    {
+      "name": "Dining Chair",
+      "articles": [
+        {
+          "articleId": "1",
+          "amount": 4
+        },
+        {
+          "articleId": "2",
+          "amount": 8
+        },
+        {
+          "articleId": "3",
+          "amount": 1
+        }
+      ]
+    },
+    {
+      "name": "Dinning Table",
+      "articles": [
+        {
+          "articleId": "1",
+          "amount": 4
+        },
+        {
+          "articleId": "2",
+          "amount": 8
+        },
+        {
+          "articleId": "4",
+          "amount": 1
+        }
+      ]
+    }
+  ]
+}
+
+
