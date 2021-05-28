@@ -118,7 +118,7 @@ public class DefaultProductService implements ProductService {
   public List<ProductTo> productParser(MultipartFile file) throws ValidationException {
 
     if (file == null) {
-      return null;
+      throw new ValidationException("File not inserted", HttpStatus.BAD_REQUEST, 40005);
     }
 
     List<ProductTo> productList = new ArrayList<>();

@@ -57,12 +57,7 @@ public class DefaultArticleService implements ArticleService {
 
   private Boolean isProductArticle(ArticleTo articleTo) {
 
-    if (articleTo.getName() == null && articleTo.getStock() == null
-        && articleTo.getAmount() != null) {
-      return true;
-    }
-
-    return false;
+    return (articleTo.getName() == null && articleTo.getStock() == null && articleTo.getAmount() != null);
   }
 
   @Override
@@ -73,7 +68,7 @@ public class DefaultArticleService implements ArticleService {
     }
 
     Article article = new Article(null, articleTo.getArticleId(), articleTo.getName(),
-        articleTo.getAmount(), articleTo.getStock());
+        articleTo.getStock(), articleTo.getAmount());
 
     return articleMapper.mapToDto(articleRepository.save(article));
   }
@@ -116,7 +111,7 @@ public class DefaultArticleService implements ArticleService {
   public List<ArticleTo> inventoryParser(MultipartFile file) {
 
     if (file == null) {
-      return null;
+      throw new ValidationException("File not inserted", HttpStatus.BAD_REQUEST, 40005);
     }
 
     List<ArticleTo> articleList;

@@ -20,7 +20,7 @@ public class DefaultProductMatcher implements ProductMatcher {
   public List<MatchedProductTo> match(List<ProductTo> products, List<ArticleTo> articles) {
 
     if (articles == null || articles.isEmpty() || products == null || products.isEmpty()) {
-      return null;
+      throw new ValidationException("Articles or Products are not consistent", HttpStatus.INTERNAL_SERVER_ERROR, 50007);
     }
 
     Map<Long, Integer> articlesAsset = new HashMap<>();
